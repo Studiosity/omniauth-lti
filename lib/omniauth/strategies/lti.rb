@@ -31,6 +31,9 @@ module OmniAuth
         fail!(:invalid_credentials)
       rescue ::OmniAuth::NoSessionError
         fail!(:session_expired)
+      rescue ::ArgumentError => e
+        raise unless e.message =~ /invalid byte sequence/
+        fail!(:invalid_encoding)
       end
 
       # define the UID
@@ -77,10 +80,6 @@ module OmniAuth
         @tp.valid_request?(request).tap do |valid|
           log :info, "Valid request? #{valid}"
         end
-      rescue ::ArgumentError => e
-        raise unless e.message =~ /invalid byte sequence/
-        log :info, 'Invalid byte sequence'
-        false
       end
     end
   end
